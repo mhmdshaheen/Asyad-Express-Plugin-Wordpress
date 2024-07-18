@@ -234,11 +234,11 @@ function sh_wc_processing_paid_order_meta_box_action( $order ) {
         if(empty($Asyad_order_awb_number)){
             if($new_status == 'wc-shipped' || $new_status  == 'shipped') {
                 $AsyadExpress = new AsyadExpress ();
-                $createShipment = $AsyadExpress->CreateShipment($order_id);
+                $createShipment = $AsyadExpress->CreateShipmentFulfillment($order_id);
                 if($createShipment['status'] == 201){
                     $CreateShipmentData = $createShipment['data'];
                     $order_awb_number = $CreateShipmentData['order_awb_number'];
-                    $ClientOrderRef = $CreateShipmentData['ClientOrderRef'];
+                    $ClientOrderRef = $CreateShipmentData['order_number'];
                      $wpdb->insert('wp_wc_orders_meta', array(
                             'order_id' => $order_id,
                             'meta_key' => 'Asyad_order_awb_number',
@@ -252,15 +252,17 @@ function sh_wc_processing_paid_order_meta_box_action( $order ) {
                         ));
                         $wpdb->insert('wp_wc_orders_meta', array(
                             'order_id' => $order_id,
-                            'meta_key' => 'Asyad_shipment_status',
-                            'meta_value' =>'true',
+                            'meta_key' => 'Asyad_tracking_url',
+                            'meta_value' =>'https://asyadexpress.om/track-trace/'.$order_awb_number,
                         ));
                         $wpdb->insert('wp_wc_orders_meta', array(
                             'order_id' => $order_id,
-                            'meta_key' => 'Asyad_shipment_status_message',
-                            'meta_value' =>$createShipment['message'],
+                            'meta_key' => 'Asyad_shipment_status',
+                            'meta_value' =>'true',
                         ));
+                        
                      update_post_meta( $order_id, 'Asyad_order_awb_number', $order_awb_number );
+                     update_post_meta( $order_id, 'Asyad_tracking_url', 'https://asyadexpress.om/track-trace/'.$order_awb_number );
                      update_post_meta( $order_id, 'Asyad_ClientOrderRef', $ClientOrderRef );
                      update_post_meta( $order_id, 'Asyad_shipment_status', 'true' );
                      update_post_meta( $order_id, 'Asyad_shipment_status_message', $createShipment['message'] );
